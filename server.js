@@ -1,59 +1,57 @@
 //requires
-const express = require('express');
+const express = require("express");
 const app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
 
 // express routing
-app.use(express.static('public'));
-
+app.use(express.static("public"));
 
 // signaling
-io.on('connection', function (socket) {
-    console.log('a user connected');
+io.on("connection", function (socket) {
+  console.log("a user connected");
 
-    socket.on('create or join', function (room) {
-        console.log('create or join to room ', room);
-        
-        var myRoom = io.sockets.adapter.rooms[room] || { length: 0 };
-        var numClients = myRoom.length;
+  socket.on("create or join", function (room) {
+    console.log("create or join to room ", room);
 
-        console.log(room, ' has ', numClients, ' clients');
+    var myRoom = io.sockets.adapter.rooms[room] || { length: 0 };
+    var numClients = myRoom.length;
 
-        if (numClients == 0) {
-            socket.join(room);
-            socket.emit('created', room);
-        } else if (numClients == 1) {
-            socket.join(room);
-            socket.emit('joined', room);
-        } else {
-            socket.emit('full', room);
-        }
-    });
+    console.log(room, " has ", numClients, " clients");
 
-    socket.on('ready', function (room){
-        socket.broadcast.to(room).emit('ready');
-    });
+    if (numClients == 0) {
+      socket.join(room);
+      socket.emit("created", room);
+    } else if (numClients == 1) {
+      socket.join(room);
+      socket.emit("joined", room);
+    } else {
+      socket.emit("full", room);
+    }
+  });
 
-    socket.on('candidate', function (event){
-        socket.broadcast.to(event.room).emit('candidate', event);
-    });
+  socket.on("ready", function (room) {
+    socket.broadcast.to(room).emit("ready");
+  });
 
-    socket.on('offer', function(event){
-        socket.broadcast.to(event.room).emit('offer',event.sdp);
-    });
+  socket.on("candidate", function (event) {
+    socket.broadcast.to(event.room).emit("candidate", event);
+  });
 
-    socket.on('answer', function(event){
-        socket.broadcast.to(event.room).emit('answer',event.sdp);
-    });
+  socket.on("offer", function (event) {
+    socket.broadcast.to(event.room).emit("offer", event.sdp);
+  });
 
-    socket.on('toggleAudio', function(event){
-        socket.broadcast.to(event.room).emit('toggleAudio', event.message);
-    });
+  socket.on("answer", function (event) {
+    socket.broadcast.to(event.room).emit("answer", event.sdp);
+  });
 
+  socket.on("toggleAudio", function (event) {
+    socket.broadcast.to(event.room).emit("toggleAudio", event.message);
+  });
 });
 
 // listener
-http.listen(3000, function () {
-    console.log('listening on *:3000');
+http.listen(8080, function () {
+  console.log("listening on *:8080");
 });

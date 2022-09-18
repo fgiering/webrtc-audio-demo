@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <head>
-  <title>WebRTC Audio Demo</title>
+  <title>WebRTC Audio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
@@ -23,15 +25,16 @@
   <h1>WebRTC Audio Demo</h1>
 
   <div id="selectRoom">
-    <button id="goBoth">Connect</button>
+    <button id="connect">Connect</button>
   </div>
 
-  <div id="conferenceRoom" style="display: none">
+  <div id="listener" hidden>
     <audio id="remoteVideo" autoplay controls></audio>
-    <br />
-    <h2>Remote audio events</h2>
-    <div id="audioEvents"></div>
   </div>
+  <div id="caller" hidden>
+    <button id="toggleMute">Mute</button>
+  </div>
+  <div id="audioEvents"></div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="client.js"></script>

@@ -1,10 +1,14 @@
+"use strict";
+
 // getting dom elements
 var divSelectRoom = document.getElementById("selectRoom");
-var divConferenceRoom = document.getElementById("conferenceRoom");
-var btnGoBoth = document.getElementById("goBoth");
+var caller = document.getElementById("caller");
+var listener = document.getElementById("listener");
+var btnConnect = document.getElementById("connect");
 var localVideo = document.getElementById("localVideo");
 var remoteVideo = document.getElementById("remoteVideo");
 var listAudioEvents = document.getElementById("audioEvents");
+var toggleMute = document.getElementById("toggleMute");
 
 // variables
 var roomNumber = "webrtc-audio-demo";
@@ -24,10 +28,9 @@ var iceServers = {
 var streamConstraints;
 var isCaller;
 
-// Let's do this
 var socket = io();
 
-btnGoBoth.onclick = () => initiateCall(true);
+btnConnect.onclick = () => initiateCall(true);
 
 function initiateCall(audio) {
   streamConstraints = {
@@ -35,8 +38,7 @@ function initiateCall(audio) {
     audio: audio,
   };
   socket.emit("create or join", roomNumber);
-  divSelectRoom.style = "display: none;";
-  divConferenceRoom.style = "display: block;";
+  divSelectRoom.hidden = true;
 }
 
 // message handlers
@@ -50,6 +52,8 @@ socket.on("created", function (room) {
     .catch(function (err) {
       console.log("An error ocurred when accessing media devices");
     });
+  caller.hidden = false;
+  listener.hidden = false;
 });
 
 socket.on("joined", function (room) {
@@ -98,6 +102,23 @@ socket.on("offer", function (event) {
 
 socket.on("answer", function (event) {
   rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(event));
+});
+
+// for development a catch-all-listener:
+socket.onAny((event, ...args) => {
+  console.log(event, args);
+});
+
+toggleMute.addEventListener("click", () => {
+  localStream.getAudioTracks()[0].enabled =
+    !localStream.getAudioTracks()[0].enabled;
+  socket.emit("toggleAudio", {
+    type: "toggleAudio",
+    room: roomNumber,
+    message: localStream.getAudioTracks()[0].enabled
+      ? "Remote user's audio is unmuted"
+      : "Remote user's audio is muted",
+  });
 });
 
 // handler functions
@@ -152,18 +173,6 @@ function createPeerConnection() {
   rtcPeerConnection.onicecandidate = onIceCandidate;
   rtcPeerConnection.onaddstream = onAddStream;
   rtcPeerConnection.addStream(localStream);
-}
-
-function toggleAudio() {
-  localStream.getAudioTracks()[0].enabled =
-    !localStream.getAudioTracks()[0].enabled;
-  socket.emit("toggleAudio", {
-    type: "toggleAudio",
-    room: roomNumber,
-    message: localStream.getAudioTracks()[0].enabled
-      ? "Remote user's audio is unmuted"
-      : "Remote user's audio is muted",
-  });
 }
 
 function addAudioEvent(event) {

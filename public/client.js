@@ -6,7 +6,7 @@ var caller = document.getElementById("caller");
 var listener = document.getElementById("listener");
 var btnConnect = document.getElementById("connect");
 var localVideo = document.getElementById("localVideo");
-var remoteVideo = document.getElementById("remoteVideo");
+var audioplayer = document.getElementById("audioplayer");
 var listAudioEvents = document.getElementById("audioEvents");
 var toggleMute = document.getElementById("toggleMute");
 
@@ -136,7 +136,7 @@ function onIceCandidate(event) {
 }
 
 function onAddStream(event) {
-  remoteVideo.srcObject = event.stream;
+  audioplayer.srcObject = event.stream;
   remoteStream = event.stream;
   if (remoteStream.getAudioTracks().length > 0) {
     addAudioEvent("Remote user is sending Audio");
